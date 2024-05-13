@@ -5,6 +5,9 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -22,7 +25,10 @@ export class LoginComponent {
   hidePassword = true;
   
   constructor(
-    private formBuilder: FormBuilder
+    private router: Router,
+    private formBuilder: FormBuilder,
+    private service: AuthService,
+    private _snackBar: MatSnackBar
   ) { }
 
   get f(): { [key: string]: AbstractControl } {
@@ -43,30 +49,14 @@ export class LoginComponent {
       return;
     }
 
-    console.log(JSON.stringify(this.loginForm.value, null, 2));
-
-    // var codigo = Math.round(this.getRandom());
-
-    // var form = {
-    //   nombre: "Krobawsky",
-    //   email: "ricardo.berrospi@tecsup.edu.pe",
-    //   destino: this.email,
-    //   asunto: "Codigo Verificación",
-    //   mensaje: codigo
-    // }
-
-    // this.authService.loginEmail(this.email, this.password)
-    // .then( (res) => {
-    //   this.messageService.sendMessage(form).subscribe(() => {
-    //     console.log("Codigo enviado: " + codigo);
-    //   })
-    //   localStorage.setItem("correo", this.email);
-    //   localStorage.setItem("codigo", codigo.toString());
-    //   this.router.navigate(['/codigo']);
-    // }).catch((err) => {
-    //   console.log(err);
-    //   alert(err.message)
-    // });
+    this.service.login(this.loginForm.value).subscribe(response => {
+      localStorage.setItem("token", response.headers.get('X-Access-Token') ?? "");
+      let body = { ...response.body! };
+      localStorage.setItem("username", body.user.username ?? "");
+      this.router.navigate(['/']);
+    }, error => {
+      this._snackBar.open(error.error?.error?.message ?? "Error no definido");
+    });
   }
 
 }

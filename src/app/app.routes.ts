@@ -16,9 +16,10 @@ export const routes: Routes = [
     path:'product', 
     component: ProductFormComponent
   },
-  // {path:'registrar',component:RegisterPageComponent},
-  // {path:'codigo',component:CodigoPageComponent},
-  // {path:'privado',component:PrivatePageComponent,canActivate: [AuthGuard]},
+  {
+    path: 'product/:id',
+    component: ProductFormComponent
+  },
   {
     path:'**', 
     redirectTo: '/'
